@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\KategoriController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,10 +14,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('dashboard');
+Route::get('/', fn() => redirect()->route('login'));
+
+
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard.index');
+    })->name('dashboard');
 });
 
-Route::get('/kategori', function () {
-    return view('kategori.index');
-})->name('kategori.index');
+Route::group(['midlleware' => 'auth'], function () {
+    Route::get('kategori/data', [KategoriController::class, 'data']);
+    Route::resource('kategori', KategoriController::class);
+});
